@@ -1,0 +1,15 @@
+terra-ia/
+├── README.md
+├── PROJECT_SCOPE.md
+├── REPO_TREE.txt
+├── src/
+├── data/
+│   ├── raw/
+│   └── processed/
+├── outputs/
+├── reports/
+│   └── final_sources/
+├── docs/
+│   ├── archive/
+│   └── README_ARCHIVE.md
+└── notebooks/
