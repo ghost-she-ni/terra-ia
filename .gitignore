@@ -1,0 +1,54 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Large data files
+data/raw/**/*.tif
+data/raw/**/*.tiff
+data/raw/**/*.gpkg
+data/raw/**/*.geojson
+data/raw/**/*.csv
+data/interim/**/*.tif
+data/interim/**/*.tiff
+data/interim/**/*.gpkg
+data/interim/**/*.geojson
+data/interim/**/*.csv
+
+# Generated outputs that should not be versioned by default
+outputs/**/*.tif
+outputs/**/*.tiff
+outputs/**/*.gpkg
+outputs/**/*.parquet
+outputs/**/*.pkl
+outputs/**/*.joblib
+
+# Environment/config secrets
+.env
+
+# Streamlit cache
+.streamlit/secrets.toml

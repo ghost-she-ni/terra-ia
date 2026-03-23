@@ -1,130 +1,49 @@
-# Terra-IA
+﻿# Terra-IA
 
-**AI-assisted morphological buildability scoring from IGN LiDAR HD data**
+Terra-IA is an AI/data project for **morphological buildability pre-screening** using **IGN LiDAR HD**, cadastral parcels, and transaction-based weak supervision.
 
-Terra-IA is a Capstone project that scores the **morphological buildability potential** of urban parcels using high-resolution LiDAR data from IGN. The goal is to support **land pre-screening** for urban densification by combining a deterministic baseline (**CPI**) with an explainable machine learning model (**XGBoost + SHAP**).
+This repository contains the **V3 reference version** of the project used for the Capstone:
+- deterministic baseline scoring (**CPI**),
+- machine learning ranking/classification workflow,
+- spatial cross-validation,
+- SHAP explainability,
+- demo-ready outputs.
 
-> Terra-IA does **not** predict legal buildability. It estimates **physical and morphological constraints** that may affect real-world feasibility.
+## Project status
+This repository is being cleaned and structured from the original V3 pipeline into a reproducible Capstone-compatible project.
 
----
+## Scope of this repository
+This repo keeps only the materials relevant to the **V3 version**:
+- source code,
+- documentation,
+- lightweight outputs,
+- report material,
+- demo app.
 
-## Official project scope
+Old exploratory files and pre-V3 materials are intentionally excluded or archived separately.
 
-The official version of the project presented for the Capstone is:
+## Planned structure
+- `src/terra_ia/` → project source code
+- `app/` → Streamlit demo
+- `scripts/` → execution scripts
+- `data/` → raw / interim / processed data
+- `outputs/` → figures, metrics, SHAP, samples
+- `reports/` → Capstone report and internal report
+- `docs/` → project documentation and Capstone checklist
 
-- **Pilot area:** Chambéry (INSEE 73065)
-- **Current operational footprint:** partial LiDAR coverage focused on the city center
-- **Pipeline:** data ingestion → parcel features → deterministic CPI baseline → ML ranking model → SHAP explainability
-- **Positioning:** decision-support tool for **pre-filtering**, not final legal validation
+## Current entry point
+At this stage, the original V3 pipeline is temporarily kept as a single file before modular refactoring.
 
-### Official V3 figures
-- 15,480 cadastral parcels
-- 2,536 valid parcels
-- 2,315 labeled parcels
-- 10 LiDAR-based ML features
+## Setup
+A first `requirements.txt` is provided. It will be refined after the codebase is split into modules and the environment is stabilized.
 
-These figures are the reference values for the current Capstone version.
-
----
-
-## Problem addressed
-
-In the context of urban densification and the French ZAN framework, identifying promising parcels is still often a manual, slow, expensive and poorly reproducible process. Existing tools focus mainly on cadastral and regulatory dimensions, while **physical terrain constraints** remain underused in early-stage site screening.
-
-Terra-IA addresses this gap by extracting parcel-level morphological signals from LiDAR data:
-- slope and terrain variability
-- hydrological proxies
-- enclosure / sky openness
-- solar exposure proxies
-- surrounding height signals
-
----
-
-## Business value
-
-Terra-IA is designed for:
-- real estate developers
-- local authorities
-- land investment teams
-- planning / engineering consultancies
-
-Main value delivered:
-- faster first-pass parcel screening
-- reproducible scoring logic
-- complementary physical reading of the terrain
-- explainable prioritization through SHAP
-
----
-
-## Repository structure
-
-```text
-terra-ia/
-├── README.md
-├── PROJECT_SCOPE.md
-├── src/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── outputs/
-├── reports/
-│   └── final_sources/
-├── docs/
-│   └── archive/
-└── notebooks/
-```
-
----
-
-## Data sources
-
-- IGN LiDAR HD (MNT / MNH, 50 cm)
-- French cadastral parcel data
-- DVF 2023 transaction data
-
----
-
-## Current status
-
-The project already includes:
-- a full V3 pipeline execution trace
-- parcel-level feature exports
-- a deterministic CPI score logic
-- a trained XGBoost LambdaMART ranking model
-- SHAP importance outputs
-- a V3 validation report
-
-Day 1 objective is to **freeze the official scope** and align all future deliverables with the same version of the project.
-
----
-
-## Out of scope for the official presentation
-
-The following items are **not claimed as delivered results** unless they are regenerated and validated before final submission:
-- full-city LiDAR coverage with 24 tiles
-- 70–80% valid parcel coverage
-- fully operational road-access feature through OSMnx
-- PLU/legal buildability integration
-- national-scale deployment
-- direct point-cloud processing
-
----
-
-## Next steps
-
-1. Clean and modularize the codebase
-2. Fix dataset export inconsistencies
-3. Align hyperparameters and final training logic
-4. Prepare the technical report
-5. Build a reliable demo
-
----
-
-## Capstone deliverables reminder
-
-The Capstone expects:
-- clean and commented source code on GitHub
-- a technical report or blog article
-- an oral presentation with a live demo
-
-This repository is being structured to match those requirements.
+## Capstone objectives
+The repository is being aligned with the Capstone requirements:
+- clean and commented source code,
+- GitHub repository,
+- reproducible workflow,
+- baseline + ML comparison,
+- explainability,
+- error analysis,
+- demo,
+- final report.

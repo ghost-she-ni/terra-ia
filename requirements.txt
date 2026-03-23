@@ -1,0 +1,15 @@
+﻿numpy
+pandas
+geopandas
+scipy
+rasterio
+rasterstats
+requests
+scikit-learn
+xgboost
+shap
+
+# Optional / may require environment-specific installation
+richdem
+rvt-py
+osmnx
