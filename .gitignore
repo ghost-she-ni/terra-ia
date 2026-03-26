@@ -52,3 +52,15 @@ outputs/**/*.joblib
 
 # Streamlit cache
 .streamlit/secrets.toml
+
+# Local generated artifacts at repo root
+/features_parcelles_v3.csv
+/ml_dataset_v3.csv
+/rapport_stats_v3.json
+/README_ML_dataset_v3.md
+
+# Terra-IA local heavy data
+/data/lidar_chamberey/*.tif
+/data/lidar_chamberey/*.csv
+/data/lidar_chamberey/*.geojson
+/data/lidar_chamberey/rasters_v3/*.tif

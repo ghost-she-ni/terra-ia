@@ -1132,34 +1132,45 @@ def compare_models_v3(df: pd.DataFrame,
         "max_depth":     [3, 4, 5],
         "learning_rate": [0.03, 0.05, 0.1],
     }
-    best_ndcg, best_params = 0, {}
+    best_ndcg, best_params = -np.inf, {}
 
     for params in ParameterGrid(param_grid):
         ndcgs = []
         model = xgb.XGBRanker(
-            objective="rank:ndcg", subsample=0.8,
-            colsample_bytree=0.8, random_state=42, n_jobs=-1,
-            **params)
+            objective="rank:ndcg",
+            subsample=0.8,
+            colsample_bytree=0.8,
+            random_state=42,
+            n_jobs=-1,
+            **params
+        )
+
         for tr_idx, val_idx in gkf.split(X, y, groups=blocks):
             Xtr, Xval = X[tr_idx], X[val_idx]
             ytr, yval = y[tr_idx], y[val_idx]
-            # Groupes par bloc pour LambdaMART
+
             blocks_tr  = blocks[tr_idx]
             _, qid_tr  = np.unique(blocks_tr, return_inverse=True)
-            # Trier par qid pour XGBoost
+
             sort_idx   = np.argsort(qid_tr)
             Xtr_sorted = Xtr[sort_idx]
             ytr_sorted = ytr[sort_idx]
             qid_sorted = qid_tr[sort_idx]
-            # Compter éléments par groupe
-            _, counts  = np.unique(qid_sorted, return_counts=True)
+
+            _, counts = np.unique(qid_sorted, return_counts=True)
             model.fit(Xtr_sorted, ytr_sorted, group=counts)
+
             scores = model.predict(Xval)
             ndcgs.append(ndcg_at_k(yval, scores, k=min(20, len(yval))))
-        mean_ndcg = np.mean(ndcgs)
+
+        mean_ndcg = float(np.mean(ndcgs))
         if mean_ndcg > best_ndcg:
-            best_ndcg   = mean_ndcg
-            best_params = params
+            best_ndcg = mean_ndcg
+            best_params = dict(params)
+
+    if not best_params:
+        best_params = {"n_estimators": 300, "max_depth": 4, "learning_rate": 0.05}
+        print("    ⚠ GridSearch XGB n'a pas retourné de best_params, fallback sur les valeurs par défaut.")
 
     print(f"    XGBRanker best params : {best_params}  NDCG@20={best_ndcg:.4f}")
 
@@ -1228,9 +1239,13 @@ def compare_models_v3(df: pd.DataFrame,
             "Precision@20": f"{np.mean(p20s):.3f} ± {np.std(p20s):.3f}",
             "NDCG@20":      f"{np.mean(ndcgs):.3f} ± {np.std(ndcgs):.3f}",
             "Spearman_CPI": f"{np.mean(spearmans):.3f}" if spearmans else "N/A",
-            "_ndcg_mean":   np.mean(ndcgs),
-            "_auc_mean":    np.mean(aucs) if aucs else 0,
+            "_ndcg_mean":   float(np.mean(ndcgs)),
+            "_auc_mean":    float(np.mean(aucs)) if aucs else 0.0,
         }
+
+        if name == "XGBoost rank:ndcg":
+            results[name]["best_params"] = dict(best_params)
+            results[name]["best_ndcg_cv"] = float(best_ndcg)
 
     # Matrice de confusion RF agrégée
     if rf_cms:
@@ -1400,8 +1415,10 @@ def train_and_explain_v3(df: pd.DataFrame,
 # SECTION 11 — EXPORT
 # ==============================================================================
 
-def export_v3(df: pd.DataFrame, parcelles: gpd.GeoDataFrame,
-              stats_report: dict) -> None:
+def export_v3(df: pd.DataFrame,
+              parcelles: gpd.GeoDataFrame,
+              stats_report: dict,
+              best_params: dict | None = None) -> None:
     """
     Export trois fichiers + rapport JSON.
 
@@ -1415,15 +1432,20 @@ def export_v3(df: pd.DataFrame, parcelles: gpd.GeoDataFrame,
     feat_cols  = [c for c in ALL_FEATURES if c in df.columns]
     meta_cols  = ["commune", "surface_m2", "nan_ratio", "is_valid",
                   "proxy_label", "block_id"]
-    all_cols   = [c for c in meta_cols + feat_cols + score_cols if c in df.columns]
 
     df_export = df.copy()
-    if "id" in parcelles.columns:
-        df_export.insert(0, "id_parcelle", parcelles["id"].values)
 
-    df_export[all_cols].to_csv(OUTPUT_CSV_V3, index=True)
+    if "id_parcelle" not in df_export.columns and "id" in parcelles.columns:
+        df_export.insert(0, "id_parcelle", parcelles["id"].values)
+    elif "id_parcelle" in df_export.columns and "id" in parcelles.columns:
+        df_export["id_parcelle"] = parcelles["id"].values
+
+    all_cols = [c for c in meta_cols + feat_cols + score_cols if c in df_export.columns]
+    export_cols = (["id_parcelle"] if "id_parcelle" in df_export.columns else []) + all_cols
+
+    df_export[export_cols].to_csv(OUTPUT_CSV_V3, index=False)
     print(f"\n  ✓ Dataset complet : {OUTPUT_CSV_V3}")
-    print(f"    {len(df_export):,} parcelles × {len(all_cols)} colonnes")
+    print(f"    {len(df_export):,} parcelles × {len(export_cols)} colonnes")
 
     # Dataset ML
     valid_labeled = (df["is_valid"] & (df["proxy_label"] != -1)) \
@@ -1443,6 +1465,12 @@ def export_v3(df: pd.DataFrame, parcelles: gpd.GeoDataFrame,
     print(f"\n  ✓ Dataset ML : {OUTPUT_CSV_ML}")
     print(f"    {len(df_ml):,} parcelles × {len(df_ml.columns)} colonnes")
     print(f"    Labels : {n_pos} pos / {n_neg} neg")
+
+    params_for_readme = best_params or {
+        "n_estimators": 300,
+        "max_depth": 4,
+        "learning_rate": 0.05
+}
 
     # README coéquipier V3
     readme = f"""# Terra-IA — Dataset ML V3 — README pour le coéquipier ML
@@ -1481,15 +1509,19 @@ _, counts  = np.unique(qid_inv, return_counts=True)
 
 model = xgb.XGBRanker(
     objective='rank:ndcg',
-    n_estimators=300,      # best GridSearch V3
-    max_depth=4,
-    learning_rate=0.05,
+    n_estimators={params_for_readme['n_estimators']},
+    max_depth={params_for_readme['max_depth']},
+    learning_rate={params_for_readme['learning_rate']},
     subsample=0.8,
     colsample_bytree=0.8,
     random_state=42
 )
 model.fit(X, y, group=counts)
 ```
+## Hyperparamètres retenus — entraînement final
+- n_estimators  = {params_for_readme['n_estimators']}
+- max_depth     = {params_for_readme['max_depth']}
+- learning_rate = {params_for_readme['learning_rate']}
 
 ## Validation croisée — GroupKFold spatial OBLIGATOIRE
 ```python
@@ -1548,6 +1580,7 @@ shap_values = explainer.shap_values(X)
         "n_labeled": int(len(df_ml)),
         "n_pos": int(n_pos), "n_neg": int(n_neg),
         "n_blocks": int(df.get("block_id", pd.Series()).nunique()),
+        "xgb_best_params": params_for_readme,
         "cpi_v3_stats": {
             "mean": float(valid["CPI_v3"].mean()) if "CPI_v3" in valid else None,
             "std":  float(valid["CPI_v3"].std())  if "CPI_v3" in valid else None,
@@ -1871,17 +1904,26 @@ def run_pipeline_v3():
     print("\n[ÉTAPE 9] XGBoost LambdaMART final + SHAP V3")
     # Récupérer les meilleurs params du GridSearch
     best_params = None
+
     for name, r in ml_results.items():
-        if "rank:ndcg" in name or "XGBoost" in name:
-            if isinstance(r, dict) and "_best_params" in r:
-                best_params = r["_best_params"]
+        if "XGBoost" in name and isinstance(r, dict):
+            best_params = r.get("best_params")
+            if best_params:
+                break
+
+    if best_params is None:
+        best_params = {"n_estimators": 300, "max_depth": 4, "learning_rate": 0.05}
+        print("  ⚠ Aucun best_params relu depuis compare_models_v3(), fallback sur les valeurs par défaut.")
+
+    stats_report["xgb_best_params"] = dict(best_params)
+
     train_and_explain_v3(df, df["proxy_label"], best_params)
 
     # ══════════════════════════════════════════════════════════════════════
     # ÉTAPE 10 — EXPORT
     # ══════════════════════════════════════════════════════════════════════
     print("\n[ÉTAPE 10] Export des résultats")
-    export_v3(df, parcelles, stats_report)
+    export_v3(df, parcelles, stats_report, best_params)
 
     print("\n" + "=" * 70)
     print("  ✓ PIPELINE V3 TERMINÉ")
