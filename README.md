@@ -1,6 +1,8 @@
 # Terra-IA
 
-Terra-IA is a capstone project focused on parcel-level constructibility scoring for Chambéry. It combines open geospatial data, feature engineering on LiDAR rasters, weak supervision, ranking models, and a Streamlit demo designed for a live defense.
+Terra-IA is a V6 capstone project focused on parcel-level constructibility scoring for Chambery. It combines open geospatial data, feature engineering on LiDAR rasters, weak supervision, ranking models, and a Streamlit demo designed for a live defense.
+
+This README describes the current V6 handover state. A few historical names are intentionally preserved for compatibility with committed outputs and previous notebooks: `CPI_v3` is the deterministic baseline score, `CPI_ML_v3` is the ML score column used by the V6 exports, and `data/lidar_chamberey` remains the default local data path.
 
 The repository is now organized around stable entrypoints so it is easier to install, run, explain, and hand over on a third-party machine: 
 
@@ -114,6 +116,8 @@ python demo.py --output-dir outputs
 
 Raw and intermediate geospatial assets are not committed because they are heavy and environment-specific. This includes downloaded LiDAR tiles, merged rasters, runtime checkpoints, logs, local caches, and virtual environments.
 
+By default, the pipeline reads and writes local raw/intermediate assets under `data/lidar_chamberey`. The spelling is legacy compatibility, not a new project scope; use `python pipeline.py --data-dir <path>` to point the pipeline at another local data folder.
+
 The final V6 deliverables are committed so the defense demo can open immediately after cloning the repository:
 
 - `features_parcelles_v6.csv`
@@ -149,11 +153,11 @@ The Streamlit app can optionally use the OpenAI API for parcel-level discussion 
 
 ## Current limitations
 
-- The project is optimized for Chambéry and not yet packaged as a multi-city product.
+- The project is optimized for Chambery and not yet packaged as a multi-city product.
 - Some optional features depend on libraries that may be absent from a lightweight environment.
 - In the final local run, `richdem` and `rvt-py` were unavailable, so TWI/thalweg/SVF features are reported as unavailable in `rapport_stats_v6.json`.
 - The local PLU layer downloaded during the final run was empty, so `zone_plu` is `inconnu`; BRGM local layers were also absent.
-- The output filenames still expose the historical V6 naming used during experimentation, but the public entrypoints are now stable.
+- Historical score column names such as `CPI_v3` and `CPI_ML_v3` are kept so existing V6 CSVs, SHAP exports, and demo code remain compatible.
 
 ## License and caution
 

@@ -166,126 +166,11 @@ import rasterio
 
 warnings.filterwarnings("ignore")
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-
-
-def _env_path(name: str, default: Path | str) -> Path:
-    raw = os.environ.get(name)
-    return Path(raw) if raw else Path(default)
-
-
-def _env_flag(name: str, default: str = "False") -> bool:
-    return os.environ.get(name, default).lower() == "true"
-
 # ==============================================================================
-# SECTION 0 — CONFIGURATION
+# SECTION 0 - CONFIGURATION
 # ==============================================================================
 
-DATA_DIR   = _env_path("TERRA_IA_DATA_DIR", PROJECT_ROOT / "data" / "lidar_chamberey")
-RASTER_DIR = _env_path("TERRA_IA_RASTER_DIR", DATA_DIR / "rasters_v3")
-OUTPUT_DIR = _env_path("TERRA_IA_OUTPUT_DIR", PROJECT_ROOT)
-for d in [DATA_DIR, RASTER_DIR, OUTPUT_DIR]:
-    d.mkdir(parents=True, exist_ok=True)
-
-# ──────────────────────────────────────────────────────────────────────────────
-# DALLES IGN V3 — Couverture étendue Chambéry
-# V2 : 4 dalles (2×2 km centre-ville) → 16.4% parcelles valides
-# V3 : 24 dalles (4×6 km)             → ~70-80% parcelles valides estimé
-#
-# Grille Lambert 93 :
-#   X : 925000 → 929000 (4 colonnes × 1 km)
-#   Y : 6499000 → 6505000 (6 lignes × 1 km)
-#
-# Pour ajouter une dalle : aller sur https://geoservices.ign.fr/lidarhd
-# → Interface MNT ou MNH → Ctrl+clic sur la dalle → copier le lien
-# ──────────────────────────────────────────────────────────────────────────────
-
-def _mnt_url(x: int, y: int) -> str:
-    """Génère l'URL WMS IGN pour une dalle MNT de 1km² en Lambert 93."""
-    return (
-        f"https://data.geopf.fr/wms-r?SERVICE=WMS&VERSION=1.3.0&EXCEPTIONS=text/xml"
-        f"&REQUEST=GetMap"
-        f"&LAYERS=IGNF_LIDAR-HD_MNT_ELEVATION.ELEVATIONGRIDCOVERAGE.LAMB93"
-        f"&FORMAT=image/geotiff&STYLES=&CRS=EPSG:2154"
-        f"&BBOX={x-0.25},{y-0.25},{x+999.75},{y+999.75}"
-        f"&WIDTH=2000&HEIGHT=2000"
-        f"&FILENAME=LHD_FXX_{x//1000:04d}_{y//1000:04d}_MNT_O_0M50_LAMB93_IGN69.tif"
-    )
-
-def _mnh_url(x: int, y: int) -> str:
-    """Génère l'URL WMS IGN pour une dalle MNH de 1km² en Lambert 93."""
-    return (
-        f"https://data.geopf.fr/wms-r?SERVICE=WMS&VERSION=1.3.0&EXCEPTIONS=text/xml"
-        f"&REQUEST=GetMap"
-        f"&LAYERS=IGNF_LIDAR-HD_MNH_ELEVATION.ELEVATIONGRIDCOVERAGE.LAMB93"
-        f"&FORMAT=image/geotiff&STYLES=&CRS=EPSG:2154"
-        f"&BBOX={x-0.25},{y-0.25},{x+999.75},{y+999.75}"
-        f"&WIDTH=2000&HEIGHT=2000"
-        f"&FILENAME=LHD_FXX_{x//1000:04d}_{y//1000:04d}_MNH_O_0M50_LAMB93_IGN69.tif"
-    )
-
-# Grille 4 colonnes × 6 lignes = 24 dalles MNT + 24 dalles MNH
-_GRID_X = [925000, 926000, 927000, 928000]
-_GRID_Y = [6499000, 6500000, 6501000, 6502000, 6503000, 6504000]
-
-URLS_MNT = shared_catalog.URLS_MNT
-URLS_MNH = shared_catalog.URLS_MNH
-
-# Fichiers fusionnés
-MNT_PATH       = DATA_DIR / "mnt_chamberey_v3.tif"
-MNH_PATH       = DATA_DIR / "mnh_chamberey_v3.tif"
-PARCELLES_PATH = DATA_DIR / "parcelles_73065.geojson"
-DVF_PATH       = DATA_DIR / "dvf_73_2023.csv"
-PLU_PATH       = DATA_DIR / "plu_chamberey.geojson"
-BRGM_DIR     = DATA_DIR / "brgm"
-SITADEL_PATH = DATA_DIR / "sitadel_73065.csv"
-BD_TOPO_PATH = DATA_DIR / "bd_topo_batiments_73065.geojson"
-
-# ── Paramètres commune
-COMMUNE_CODE   = shared_catalog.COMMUNE_CODE
-TARGET_CRS     = shared_catalog.TARGET_CRS
-LAT_DEG        = shared_catalog.LAT_DEG
-
-# Zones constructibles PLU (Code de l'Urbanisme L151-9)
-PLU_CONSTRUCTIBLE_ZONES = shared_catalog.PLU_CONSTRUCTIBLE_ZONES
-
-# ── Fichiers de sortie
-OUTPUT_CSV_V3    = _env_path("TERRA_IA_FEATURES_V3_PATH", OUTPUT_DIR / "features_parcelles_v3.csv")
-OUTPUT_CSV_ML    = _env_path("TERRA_IA_ML_V3_PATH", OUTPUT_DIR / "ml_dataset_v3.csv")
-OUTPUT_REPORT    = _env_path("TERRA_IA_REPORT_PATH", OUTPUT_DIR / "rapport_stats_v6.json")
-OUTPUT_CSV_V4    = _env_path("TERRA_IA_FEATURES_V4_PATH", OUTPUT_DIR / "features_parcelles_v4.csv")
-OUTPUT_CSV_ML_V4 = _env_path("TERRA_IA_ML_V4_PATH", OUTPUT_DIR / "ml_dataset_v4.csv")
-OUTPUT_CSV_V6    = _env_path("TERRA_IA_FEATURES_PATH", OUTPUT_DIR / "features_parcelles_v6.csv")
-OUTPUT_CSV_ML_V6 = _env_path("TERRA_IA_ML_PATH", OUTPUT_DIR / "ml_dataset_v6.csv")
-OUTPUT_SHAP_PARCELLE = _env_path("TERRA_IA_SHAP_PATH", OUTPUT_DIR / "shap_par_parcelle_v6.csv")
-OUTPUT_CLUSTER_SCORES = _env_path("TERRA_IA_CLUSTER_SCORES_PATH", OUTPUT_DIR / "cluster_scores_v6.csv")
-CLUSTER_SCORES_PATH = Path(OUTPUT_CLUSTER_SCORES)
-APPROACH3_PATH = _env_path("TERRA_IA_APPROACH3_PATH", OUTPUT_DIR / "approach3_outputs/approach3_all_parcels.csv")
-APPROACH4_PATH = _env_path("TERRA_IA_APPROACH4_PATH", OUTPUT_DIR / "approach4_outputs/approach4_preference_scores.csv")
-OUTPUT_README_ML_V6 = _env_path("TERRA_IA_ML_README_PATH", OUTPUT_DIR / "README_ML_dataset_v6.md")
-
-for p in [
-    OUTPUT_CSV_V3,
-    OUTPUT_CSV_ML,
-    OUTPUT_REPORT,
-    OUTPUT_CSV_V4,
-    OUTPUT_CSV_ML_V4,
-    OUTPUT_CSV_V6,
-    OUTPUT_CSV_ML_V6,
-    OUTPUT_SHAP_PARCELLE,
-    OUTPUT_CLUSTER_SCORES,
-    OUTPUT_README_ML_V6,
-]:
-    p.parent.mkdir(parents=True, exist_ok=True)
-
-# ── Flags
-SKIP_DOWNLOAD   = _env_flag("SKIP_DOWNLOAD")
-SKIP_FEATURES   = _env_flag("SKIP_FEATURES")
-SKIP_PLU        = _env_flag("SKIP_PLU")
-SKIP_BATI       = _env_flag("SKIP_BATI")
-SKIP_BOOTSTRAP  = _env_flag("SKIP_BOOTSTRAP")
-SKIP_ZONAL      = _env_flag("SKIP_ZONAL")
-
+# All paths, flags, and output names are resolved in src/terra_ia/pipeline_runtime.py.
 RUNTIME = build_pipeline_runtime_config()
 PROJECT_ROOT = RUNTIME.project_root
 DATA_DIR = RUNTIME.data_dir
@@ -328,6 +213,12 @@ SKIP_BOOTSTRAP = RUNTIME.skip_bootstrap
 SKIP_ZONAL = RUNTIME.skip_zonal
 RESUME = RUNTIME.resume
 REFRESH_OSM = RUNTIME.refresh_osm
+URLS_MNT = shared_catalog.URLS_MNT
+URLS_MNH = shared_catalog.URLS_MNH
+COMMUNE_CODE = shared_catalog.COMMUNE_CODE
+TARGET_CRS = shared_catalog.TARGET_CRS
+LAT_DEG = shared_catalog.LAT_DEG
+PLU_CONSTRUCTIBLE_ZONES = shared_catalog.PLU_CONSTRUCTIBLE_ZONES
 
 # ── Paramètres filtrage
 SEUIL_NAN      = 0.40    # V3 : assoupli à 40% (vs 50% V2) pour plus de parcelles

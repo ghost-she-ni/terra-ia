@@ -111,7 +111,7 @@ def pipeline_env_updates_from_args(args: argparse.Namespace) -> dict[str, str]:
     return env_updates
 
 
-def build_pipeline_runtime_config() -> PipelineRuntimeConfig:
+def build_pipeline_runtime_config(*, ensure_paths: bool = True) -> PipelineRuntimeConfig:
     data_dir = env_path("TERRA_IA_DATA_DIR", PROJECT_ROOT / "data" / "lidar_chamberey")
     raster_dir = env_path("TERRA_IA_RASTER_DIR", data_dir / "rasters_v3")
     output_dir = env_path("TERRA_IA_OUTPUT_DIR", PROJECT_ROOT)
@@ -182,42 +182,43 @@ def build_pipeline_runtime_config() -> PipelineRuntimeConfig:
         refresh_osm=env_flag("TERRA_IA_REFRESH_OSM"),
     )
 
-    ensure_directories(
-        [
-            config.data_dir,
-            config.raster_dir,
-            config.output_dir,
-            config.checkpoint_dir,
-            config.logs_dir,
-        ]
-    )
-    ensure_parent_directories(
-        [
-            config.output_csv_v3,
-            config.output_csv_ml_v3,
-            config.output_report,
-            config.output_csv_v4,
-            config.output_csv_ml_v4,
-            config.output_csv_v6,
-            config.output_csv_ml_v6,
-            config.output_shap_parcelle,
-            config.output_cluster_scores,
-            config.output_readme_ml_v6,
-            config.approach3_path,
-            config.approach4_path,
-            config.pipeline_state_path,
-            config.stage3_features_checkpoint,
-            config.stage6_labels_checkpoint,
-            config.stage9_scores_checkpoint,
-            config.log_file,
-            config.osm_roads_cache_path,
-        ]
-    )
+    if ensure_paths:
+        ensure_directories(
+            [
+                config.data_dir,
+                config.raster_dir,
+                config.output_dir,
+                config.checkpoint_dir,
+                config.logs_dir,
+            ]
+        )
+        ensure_parent_directories(
+            [
+                config.output_csv_v3,
+                config.output_csv_ml_v3,
+                config.output_report,
+                config.output_csv_v4,
+                config.output_csv_ml_v4,
+                config.output_csv_v6,
+                config.output_csv_ml_v6,
+                config.output_shap_parcelle,
+                config.output_cluster_scores,
+                config.output_readme_ml_v6,
+                config.approach3_path,
+                config.approach4_path,
+                config.pipeline_state_path,
+                config.stage3_features_checkpoint,
+                config.stage6_labels_checkpoint,
+                config.stage9_scores_checkpoint,
+                config.log_file,
+                config.osm_roads_cache_path,
+            ]
+        )
     return config
 
 
 def expected_generated_outputs() -> list[Path]:
-    config = build_pipeline_runtime_config()
+    config = build_pipeline_runtime_config(ensure_paths=False)
     return [
         config.output_csv_v6,
         config.output_csv_ml_v6,
