@@ -1,0 +1,201 @@
+{
+  "runtime": {
+    "started_at": "2026-04-17T11:15:47.160986+00:00",
+    "finished_at": "2026-04-17T11:16:21.307830+00:00",
+    "total_seconds": 34.148
+  },
+  "external_data_status": {
+    "dvf": {
+      "available": true,
+      "path": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\data\\lidar_chamberey\\dvf_73_2023.csv"
+    },
+    "plu": {
+      "available": true,
+      "path": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\data\\lidar_chamberey\\plu_chamberey.geojson",
+      "skip_requested": false
+    },
+    "bd_topo": {
+      "available": true,
+      "path": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\data\\lidar_chamberey\\bd_topo_batiments_73065.geojson",
+      "skip_requested": false
+    },
+    "brgm": {
+      "available_layers": [],
+      "path": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\data\\lidar_chamberey\\brgm"
+    },
+    "optional_modules": {
+      "richdem": false,
+      "rvt": false,
+      "osmnx": true
+    }
+  },
+  "dvf_available": true,
+  "brgm_available": [],
+  "plu_available": true,
+  "bd_topo_available": true,
+  "feature_availability": {
+    "slope_percentiles": true,
+    "flat_area_ratio": true,
+    "tri": true,
+    "twi": false,
+    "thalweg": false,
+    "svf": false,
+    "hillshade": true,
+    "aspect_south": true,
+    "curvature": true,
+    "height_obj": true,
+    "road_distance": "True",
+    "parcel_shape": true,
+    "ces_residual": true,
+    "zoning_context": true
+  },
+  "filtrage": {
+    "n_total": 15486,
+    "n_valid": 11721,
+    "n_nan": 1968
+  },
+  "cluster_label_agreement": {
+    "cluster_label_agreement": 11.542553191489361,
+    "pure_pos_in_best": 2.054794520547945,
+    "pure_neg_in_worst": 28.94472361809045
+  },
+  "bloc_analysis": {
+    "mixed": 124,
+    "pure_pos": 53,
+    "pure_neg": 49,
+    "total": 226
+  },
+  "ml_results": {
+    "Logistic Regression": {
+      "AUC": "1.000 +/- 0.000",
+      "Precision@20": "1.000 +/- 0.000",
+      "NDCG@20": "1.000 +/- 0.000",
+      "Spearman_CPI": "0.791"
+    },
+    "Random Forest": {
+      "AUC": "1.000 +/- 0.000",
+      "Precision@20": "1.000 +/- 0.000",
+      "NDCG@20": "1.000 +/- 0.000",
+      "Spearman_CPI": "0.814"
+    },
+    "XGBoost rank:ndcg": {
+      "AUC": "1.000 +/- 0.000",
+      "Precision@20": "1.000 +/- 0.000",
+      "NDCG@20": "1.000 +/- 0.000",
+      "Spearman_CPI": "0.822"
+    }
+  },
+  "checkpoint_status": {
+    "resume_requested": true,
+    "state_path": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\checkpoints\\pipeline_state.json",
+    "restored_from": [
+      "stage6"
+    ],
+    "changed_keys": [
+      "option:skip_bootstrap",
+      "plu_path"
+    ],
+    "invalidated_steps": [],
+    "stage3_checkpoint": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\checkpoints\\stage3_features.parquet",
+    "stage6_checkpoint": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\checkpoints\\stage6_labels.parquet",
+    "stage9_checkpoint": "D:\\ESIEA\\2025-2026\\skema\\Spring Semester\\AI Capstone\\terra-ia\\checkpoints\\stage9_scores.parquet",
+    "completed_steps": [
+      "stage3.aspect_south",
+      "stage3.ces_residual",
+      "stage3.curvature",
+      "stage3.flat_area_ratio",
+      "stage3.height_obj",
+      "stage3.hillshade",
+      "stage3.parcel_shape",
+      "stage3.road_distance",
+      "stage3.slope_percentiles",
+      "stage3.svf",
+      "stage3.thalweg",
+      "stage3.tri",
+      "stage3.twi",
+      "stage6.labels",
+      "stage7.block_analysis",
+      "stage8.model_compare",
+      "stage9.bootstrap",
+      "stage9.train_explain"
+    ]
+  },
+  "consensus_meta": {
+    "CPI_v3": true,
+    "cluster_score": true,
+    "CPI_market": false,
+    "CPI_preference": false,
+    "available_count": 2,
+    "median_consensus": 51.50942890332743,
+    "median_confidence": 0.9670384918079897,
+    "high_conf": 14649,
+    "low_conf": 157,
+    "n_total": 15486
+  },
+  "version": "6.0",
+  "commune": "73065",
+  "n_total": 15486,
+  "n_valid": 11721,
+  "n_labeled": 5640,
+  "n_pos": 3650,
+  "n_neg": 1990,
+  "n_blocks": 284,
+  "cpi_v3_stats": {
+    "mean": 52.21550209026534,
+    "std": 13.111371498272659,
+    "min": 11.9,
+    "max": 68.3
+  },
+  "cpi_technique_stats": {
+    "mean": 57.160532377783476,
+    "std": 14.260626964584493,
+    "min": 12.4,
+    "max": 69.7
+  },
+  "brgm_flags": {
+    "brgm_argiles_flag": 0,
+    "brgm_mvt_terrain_flag": 0
+  },
+  "features": [
+    "slope_p50",
+    "slope_p90",
+    "slope_std",
+    "twi_mean",
+    "has_thalweg_mean",
+    "profile_curvature_mean",
+    "tri_mean",
+    "hillshade_winter_mean",
+    "aspect_south_ratio_mean",
+    "svf_mean"
+  ],
+  "all_features": [
+    "slope_p50",
+    "slope_p90",
+    "slope_std",
+    "twi_mean",
+    "has_thalweg_mean",
+    "profile_curvature_mean",
+    "tri_mean",
+    "hillshade_winter_mean",
+    "aspect_south_ratio_mean",
+    "svf_mean"
+  ],
+  "grid_size_m": 300,
+  "tau_softmin": null,
+  "plu_distribution": {
+    "U": 0,
+    "AU": 0,
+    "N": 0,
+    "A": 0,
+    "inconnu": 15486
+  },
+  "shape_metrics": {
+    "median_compactness": 0.6122791128491085,
+    "n_elongated": 1485
+  },
+  "ces_metrics": {
+    "median_residuel": 0.4,
+    "n_viable_80m2": 9525,
+    "n_saturated": 171
+  }
+}

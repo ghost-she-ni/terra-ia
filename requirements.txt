@@ -1,15 +1,26 @@
-﻿numpy
+numpy
 pandas
 geopandas
 scipy
 rasterio
 rasterstats
+shapely
+pyproj
+fiona
 requests
 scikit-learn
 xgboost
 shap
+streamlit
+plotly
+folium
+streamlit-folium
+osmnx
+pyarrow
+openai
+PyPDF2
+pytest
 
 # Optional / may require environment-specific installation
 richdem
 rvt-py
-osmnx

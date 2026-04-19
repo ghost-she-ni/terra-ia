@@ -1,0 +1,31 @@
+name: terra-ia-capstone
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - numpy
+  - pandas
+  - scipy
+  - geopandas
+  - rasterio
+  - rasterstats
+  - shapely
+  - pyproj
+  - fiona
+  - requests
+  - scikit-learn
+  - xgboost
+  - shap
+  - streamlit
+  - plotly
+  - folium
+  - osmnx
+  - richdem
+  - pyarrow
+  - pytest
+  - pip:
+      - streamlit-folium
+      - rvt-py
+      - openai
+      - PyPDF2
