@@ -7,6 +7,7 @@ __pycache__/
 
 # Virtual environments
 .venv/
+.venv312/
 venv/
 env/
 
@@ -21,11 +22,18 @@ Thumbs.db
 
 # Logs
 *.log
+/logs/
+/pipeline_resume*.log
 
 # Build / packaging
 build/
 dist/
 *.egg-info/
+
+# Runtime caches and local checkpoints
+/cache/
+/checkpoints/
+/resume_test/
 
 # Large data files
 data/raw/**/*.tif
@@ -52,3 +60,20 @@ outputs/**/*.joblib
 
 # Streamlit cache
 .streamlit/secrets.toml
+
+# Local generated artifacts at repo root
+/features_parcelles_v3.csv
+/ml_dataset_v3.csv
+/rapport_stats_v3.json
+/README_ML_dataset_v3.md
+
+# Keep final V6 capstone deliverables versioned for the defense demo.
+!/features_parcelles_v6.csv
+!/ml_dataset_v6.csv
+!/cluster_scores_v6.csv
+!/shap_par_parcelle_v6.csv
+!/rapport_stats_v6.json
+!/README_ML_dataset_v6.md
+
+# Terra-IA local heavy data
+/data/lidar_chamberey/
