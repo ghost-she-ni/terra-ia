@@ -336,7 +336,7 @@ GLOSSARY = {
     "cpi_ml_std": "Variabilité du score ML (bootstrap). Bas = score stable, haut = incertitude plus forte.",
     "has_thalweg_mean": "Présence d'un axe de drainage naturel (eau). Plus c'est élevé, plus il faut vérifier l'hydrologie.",
     "surface_m2": "Surface cadastrale exploitable. La capacité de projet dépend aussi du PLU et des retraits.",
-est ce     "svf_mean": "Sky View Factor : ouverture au ciel. Valeur élevée = meilleur ensoleillement potentiel.",
+    "svf_mean": "Sky View Factor : ouverture au ciel. Valeur élevée = meilleur ensoleillement potentiel.",
 }
 
 DEMO_RUNTIME = build_demo_runtime_config()
