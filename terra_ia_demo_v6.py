@@ -339,19 +339,6 @@ GLOSSARY = {
     "svf_mean": "Sky View Factor : ouverture au ciel. Valeur élevée = meilleur ensoleillement potentiel.",
 }
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-
-
-def _env_path(name: str, default: Path | str) -> Path:
-    raw = os.environ.get(name)
-    return Path(raw) if raw else Path(default)
-
-
-OUTPUT_DIR = _env_path("TERRA_IA_OUTPUT_DIR", PROJECT_ROOT)
-DATA_FEATURES_PATH = _env_path("TERRA_IA_FEATURES_PATH", OUTPUT_DIR / "features_parcelles_v6.csv")
-DATA_SHAP_PATH = _env_path("TERRA_IA_SHAP_PATH", OUTPUT_DIR / "shap_par_parcelle_v6.csv")
-DATA_GEO_PATH = _env_path("TERRA_IA_GEO_PATH", PROJECT_ROOT / "data" / "lidar_chamberey" / "parcelles_73065.geojson")
-
 DEMO_RUNTIME = build_demo_runtime_config()
 PROJECT_ROOT = DEMO_RUNTIME.project_root
 OUTPUT_DIR = DEMO_RUNTIME.output_dir
