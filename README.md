@@ -2,7 +2,7 @@
 
 Terra-IA is a capstone project focused on parcel-level constructibility scoring for Chambéry. It combines open geospatial data, feature engineering on LiDAR rasters, weak supervision, ranking models, and a Streamlit demo designed for a live defense.
 
-The repository is now organized around stable entrypoints so it is easier to install, run, explain, and hand over on a third-party machine:
+The repository is now organized around stable entrypoints so it is easier to install, run, explain, and hand over on a third-party machine: 
 
 - `pipeline.py`: clean CLI entrypoint for the end-to-end data and modeling pipeline.
 - `demo.py`: clean CLI entrypoint for the Streamlit demo.
